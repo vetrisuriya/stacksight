@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy – StackSight</title>
+  <meta name="description" content="StackSight Privacy Policy — no data collected, no servers, no accounts." />
+  <link rel="icon" href="../assets/icon48.png" type="image/png" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:       #0f172a;
+      --bg2:      #1e293b;
+      --border:   rgba(99,102,241,.2);
+      --accent:   #6366f1;
+      --accent-lt:#818cf8;
+      --text:     #f1f5f9;
+      --muted:    #94a3b8;
+    }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg); color: var(--text);
+      line-height: 1.75; min-height: 100vh;
+    }
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: 14px 0; background: rgba(15,23,42,.9);
+      backdrop-filter: blur(10px);
+    }
+    .nav-inner { max-width: 860px; margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between; }
+    .logo { display: flex; align-items: center; gap: 10px;
+      text-decoration: none; font-weight: 700; color: var(--text); font-size: 1.05rem; }
+    .logo img { width: 28px; height: 28px; border-radius: 7px; }
+    .back { color: var(--accent-lt); font-size: .88rem; text-decoration: none; }
+    .back:hover { text-decoration: underline; }
+    main { max-width: 760px; margin: 60px auto; padding: 0 24px 80px; }
+    .badge {
+      display: inline-block; background: rgba(99,102,241,.15);
+      border: 1px solid var(--border); border-radius: 6px;
+      padding: 4px 12px; font-size: .78rem; color: var(--accent-lt);
+      margin-bottom: 28px;
+    }
+    h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; margin-bottom: 10px; }
+    .updated { color: var(--muted); font-size: .88rem; margin-bottom: 48px; }
+    h2 { font-size: 1.15rem; font-weight: 700; color: var(--text); margin: 40px 0 12px; }
+    p  { color: var(--muted); margin-bottom: 16px; font-size: .97rem; }
+    ul { color: var(--muted); padding-left: 24px; margin-bottom: 16px; }
+    li { margin-bottom: 8px; font-size: .97rem; }
+    .highlight {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 10px;
+      padding: 20px 24px; margin: 28px 0;
+    }
+    .highlight p { margin: 0; color: var(--text); font-weight: 500; }
+    a { color: var(--accent-lt); }
+    a:hover { text-decoration: underline; }
+    footer { text-align: center; padding: 28px; color: var(--muted); font-size: .82rem;
+      border-top: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">
+      <img src="../assets/icon48.png" alt="StackSight" />
+      StackSight
+    </a>
+    <a href="index.html" class="back">← Back to home</a>
+  </div>
+</nav>
+
+<main>
+  <div class="badge">Legal</div>
+  <h1>Privacy Policy</h1>
+  <p class="updated">Last updated: June 2026</p>
+
+  <div class="highlight">
+    <p>
+      🔒 <strong>TL;DR:</strong> StackSight collects absolutely nothing. No data ever leaves your device.
+      No account, no analytics, no server, no storage — anywhere.
+    </p>
+  </div>
+
+  <h2>1. Who we are</h2>
+  <p>
+    StackSight is a free, open-source Chrome Extension developed and maintained by volunteer contributors.
+    The source code is publicly available at
+    <a href="https://github.com/vetrisuriya/stacksight" target="_blank" rel="noopener">github.com/vetrisuriya/stacksight</a>.
+    There is no company, no LLC, and no commercial entity behind this extension.
+  </p>
+
+  <h2>2. Data we do NOT collect</h2>
+  <p>StackSight does not collect, store, transmit, sell, or share any of the following:</p>
+  <ul>
+    <li>URLs or domain names you visit</li>
+    <li>Browsing history or browsing patterns</li>
+    <li>Personally identifiable information of any kind</li>
+    <li>IP addresses</li>
+    <li>Device identifiers or hardware information</li>
+    <li>Login credentials or authentication tokens</li>
+    <li>Form data, passwords, or payment information</li>
+    <li>Cookies set by websites you visit</li>
+    <li>Any data from web pages you visit</li>
+  </ul>
+
+  <h2>3. What happens when you use StackSight</h2>
+  <p>
+    When you click the StackSight icon on a tab, the following happens entirely inside your local browser:
+  </p>
+  <ul>
+    <li>
+      <strong>DOM inspection:</strong> A content script reads the HTML structure of the current page
+      (script tags, link tags, meta tags) to identify technology fingerprints. This data is processed
+      in memory and immediately discarded after rendering.
+    </li>
+    <li>
+      <strong>JavaScript global inspection:</strong> A script runs in the page's own context to check
+      for known global objects (e.g. window.React). This data never leaves the browser tab.
+    </li>
+    <li>
+      <strong>HTTP headers:</strong> The background service worker makes a HEAD request (falling back
+      to GET) to the <em>same URL you are already visiting</em> — not to any external server — to
+      read its response headers. This is the only outbound network request, and it goes to the
+      site you're already on.
+    </li>
+  </ul>
+  <p>
+    All processing happens in your browser's memory. Results are displayed in the popup and
+    optionally downloaded as a local file. No results are stored, synced, or sent anywhere.
+  </p>
+
+  <h2>4. Permissions explained</h2>
+  <p>StackSight requests the following Chrome permissions and only uses them for the stated purpose:</p>
+  <ul>
+    <li>
+      <strong>activeTab</strong> — Required to read the current tab's URL and inject the analysis
+      scripts. Only activates when you click the extension icon.
+    </li>
+    <li>
+      <strong>scripting</strong> — Required to execute DOM inspection and JavaScript global inspection
+      on the active page.
+    </li>
+    <li>
+      <strong>tabs</strong> — Required to read the current tab's URL and title for display and
+      export file naming.
+    </li>
+    <li>
+      <strong>host_permissions (&lt;all_urls&gt;)</strong> — Required by the background service worker
+      to make the HEAD request to the page you are already visiting, in order to read its HTTP
+      response headers. No cross-site requests are made.
+    </li>
+  </ul>
+
+  <h2>5. Local storage</h2>
+  <p>
+    StackSight uses <code>localStorage</code> to save a single user preference: your chosen UI theme
+    (dark or light). This value is stored in your browser only, never transmitted, and you can clear
+    it at any time by clearing your browser's local storage.
+  </p>
+  <p>No other data is stored anywhere — not in <code>chrome.storage</code>, not in cookies,
+  not in IndexedDB.</p>
+
+  <h2>6. Third-party services</h2>
+  <p>
+    StackSight does not use or connect to any third-party services, APIs, analytics platforms,
+    CDNs, or cloud services of its own. It has no backend.
+  </p>
+
+  <h2>7. Exported reports</h2>
+  <p>
+    If you choose to export a JSON or TXT report using the Export buttons in the popup, that file is
+    downloaded directly to your device using a browser Blob URL. It is never sent to any server.
+    You are in full control of that file after it is downloaded.
+  </p>
+
+  <h2>8. Children's privacy</h2>
+  <p>
+    StackSight is a developer tool and is not directed at children under the age of 13.
+    We do not knowingly collect any information from children because we do not collect
+    any information from anyone.
+  </p>
+
+  <h2>9. Changes to this policy</h2>
+  <p>
+    If this privacy policy ever changes, the updated version will be published at this URL and
+    the "last updated" date at the top will be revised. The Git history of the repository also
+    serves as a full audit trail of any changes.
+  </p>
+
+  <h2>10. Contact</h2>
+  <p>
+    Questions about this privacy policy? Open an issue on GitHub:
+    <a href="https://github.com/vetrisuriya/stacksight/issues" target="_blank" rel="noopener">
+      github.com/vetrisuriya/stacksight/issues
+    </a>
+  </p>
+
+</main>
+
+<footer>
+  © 2026 StackSight Contributors · MIT License ·
+  <a href="index.html">Home</a>
+</footer>
+
+</body>
+</html>

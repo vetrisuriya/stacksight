@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StackSight</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body data-theme="dark">
+
+  <!-- ── Header ─────────────────────────────── -->
+  <header class="header">
+    <div class="header-brand">
+      <div class="logo-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <rect width="24" height="24" rx="6" fill="url(#lg1)"/>
+          <text x="12" y="17" text-anchor="middle" font-size="11" font-weight="700"
+                font-family="system-ui,sans-serif" fill="white">SS</text>
+          <defs>
+            <linearGradient id="lg1" x1="0" y1="0" x2="24" y2="24">
+              <stop offset="0%" stop-color="#58a6ff"/>
+              <stop offset="100%" stop-color="#bc8cff"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <span class="brand-name">StackSight</span>
+    </div>
+    <div class="header-actions">
+      <button id="themeToggle" class="icon-btn" title="Toggle theme" aria-label="Toggle theme">
+        <svg id="iconMoon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg id="iconSun" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display:none">
+          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2"/>
+          <line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2"/>
+          <line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2"/>
+          <line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </button>
+      <button id="refreshBtn" class="icon-btn" title="Re-analyze page" aria-label="Refresh">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 4 23 10 17 10"/>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Site Info ─────────────────────────── -->
+  <div class="site-info">
+    <div id="siteUrl" class="site-url">Analyzing...</div>
+    <div id="siteTitle" class="site-title">Please wait</div>
+  </div>
+
+  <!-- ── Score Grid ────────────────────────── -->
+  <div class="scores-grid">
+    <div class="score-card" id="card-tech">
+      <div class="score-value" id="score-tech">–</div>
+      <div class="score-label">Technology</div>
+    </div>
+    <div class="score-card" id="card-security">
+      <div class="score-value" id="score-security">–</div>
+      <div class="score-label">Security</div>
+    </div>
+    <div class="score-card" id="card-performance">
+      <div class="score-value" id="score-performance">–</div>
+      <div class="score-label">Performance</div>
+    </div>
+    <div class="score-card" id="card-privacy">
+      <div class="score-value" id="score-privacy">–</div>
+      <div class="score-label">Privacy</div>
+    </div>
+  </div>
+
+  <!-- ── Tab Navigation ───────────────────── -->
+  <nav class="tab-nav" role="tablist">
+    <button class="tab-btn active" data-tab="overview" role="tab">Overview</button>
+    <button class="tab-btn" data-tab="tech" role="tab">Tech</button>
+    <button class="tab-btn" data-tab="analytics" role="tab">Analytics</button>
+    <button class="tab-btn" data-tab="infra" role="tab">Infra</button>
+    <button class="tab-btn" data-tab="security" role="tab">Security</button>
+    <button class="tab-btn" data-tab="performance" role="tab">Perf</button>
+  </nav>
+
+  <!-- ── Tab Content ───────────────────────── -->
+  <main class="tab-content">
+
+    <!-- Overview Tab -->
+    <div class="tab-panel active" id="tab-overview" role="tabpanel">
+      <div id="overview-loading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Scanning technology stack…</p>
+      </div>
+      <div id="overview-content" class="panel-content hidden">
+        <section class="section">
+          <h3 class="section-title">Detected Stack</h3>
+          <div id="overview-stack" class="tech-grid"></div>
+        </section>
+        <section class="section">
+          <h3 class="section-title">Quick Summary</h3>
+          <div id="overview-summary" class="summary-list"></div>
+        </section>
+      </div>
+      <div id="overview-error" class="error-state hidden"></div>
+    </div>
+
+    <!-- Technologies Tab -->
+    <div class="tab-panel" id="tab-tech" role="tabpanel">
+      <div class="panel-content">
+        <section class="section">
+          <h3 class="section-title">CMS</h3>
+          <div id="tech-cms" class="tech-list"></div>
+        </section>
+        <section class="section">
+          <h3 class="section-title">Frontend Frameworks</h3>
+          <div id="tech-frameworks" class="tech-list"></div>
+        </section>
+        <section class="section">
+          <h3 class="section-title">JavaScript Libraries</h3>
+          <div id="tech-libraries" class="tech-list"></div>
+        </section>
+        <section class="section">
+          <h3 class="section-title">Backend Technology</h3>
+          <div id="tech-backend" class="tech-list"></div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Analytics Tab -->
+    <div class="tab-panel" id="tab-analytics" role="tabpanel">
+      <div class="panel-content">
+        <section class="section">
+          <h3 class="section-title">Tracking & Analytics</h3>
+          <div id="analytics-list" class="tech-list"></div>
+        </section>
+        <div id="analytics-empty" class="empty-state hidden">
+          <div class="empty-icon">🔒</div>
+          <p>No analytics or trackers detected</p>
+          <span class="empty-sub">This site appears tracker-free</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Infrastructure Tab -->
+    <div class="tab-panel" id="tab-infra" role="tabpanel">
+      <div class="panel-content">
+        <section class="section">
+          <h3 class="section-title">CDN Provider</h3>
+          <div id="infra-cdn" class="tech-list"></div>
+        </section>
+        <section class="section">
+          <h3 class="section-title">Cloud Provider</h3>
+          <div id="infra-cloud" class="tech-list"></div>
+        </section>
+        <section class="section">
+          <h3 class="section-title">SSL / TLS</h3>
+          <div id="infra-ssl" class="ssl-card"></div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Security Tab -->
+    <div class="tab-panel" id="tab-security" role="tabpanel">
+      <div class="panel-content">
+        <div id="security-score-bar" class="score-bar-wrap"></div>
+        <section class="section">
+          <h3 class="section-title">HTTP Security Headers</h3>
+          <div id="security-headers" class="header-list"></div>
+        </section>
+        <section class="section">
+          <h3 class="section-title">Recommendations</h3>
+          <div id="security-recs" class="rec-list"></div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Performance Tab -->
+    <div class="tab-panel" id="tab-performance" role="tabpanel">
+      <div class="panel-content">
+        <div id="perf-score-bar" class="score-bar-wrap"></div>
+        <section class="section">
+          <h3 class="section-title">Resource Counts</h3>
+          <div id="perf-resources" class="resource-grid"></div>
+        </section>
+        <section class="section">
+          <h3 class="section-title">Recommendations</h3>
+          <div id="perf-recs" class="rec-list"></div>
+        </section>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── Export Bar ────────────────────────── -->
+  <div class="export-bar">
+    <button id="exportJson" class="export-btn" disabled>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Export JSON
+    </button>
+    <button id="exportTxt" class="export-btn" disabled>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+      </svg>
+      Export TXT
+    </button>
+  </div>
+
+  <!-- Service scripts (loaded in popup context) -->
+  <script src="../services/detector.js"></script>
+  <script src="../services/cms-detector.js"></script>
+  <script src="../services/framework-detector.js"></script>
+  <script src="../services/analytics-detector.js"></script>
+  <script src="../services/cloud-detector.js"></script>
+  <script src="../services/cdn-detector.js"></script>
+  <script src="../services/security-detector.js"></script>
+  <script src="../services/performance-detector.js"></script>
+  <script src="../services/export-service.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

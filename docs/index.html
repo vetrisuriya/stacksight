@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StackSight – Instantly Discover Any Website's Tech Stack</title>
+  <meta name="description" content="Free, open-source Chrome Extension that detects the exact technology stack of any website — CMS, frameworks, analytics, CDN, cloud, security score and more. No login. No data collection. 100% local." />
+  <meta property="og:title" content="StackSight – Tech Stack Detector" />
+  <meta property="og:description" content="Free Chrome Extension. Detect any website's tech stack instantly. No login. No data collection." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://your-org.github.io/stacksight" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="StackSight – Tech Stack Detector" />
+  <meta name="twitter:description" content="Free Chrome Extension. Detect any website's tech stack instantly." />
+  <link rel="icon" href="../assets/icon48.png" type="image/png" />
+  <style>
+    /* ── Reset & tokens ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:         #0f172a;
+      --bg2:        #1e293b;
+      --bg3:        #0d1526;
+      --border:     rgba(99,102,241,.25);
+      --accent:     #6366f1;
+      --accent-lt:  #818cf8;
+      --accent-glow:rgba(99,102,241,.35);
+      --text:       #f1f5f9;
+      --muted:      #94a3b8;
+      --green:      #22c55e;
+      --yellow:     #f59e0b;
+      --red:        #ef4444;
+      --radius:     14px;
+      --font:       'Inter', system-ui, -apple-system, sans-serif;
+      --mono:       'JetBrains Mono', 'Fira Code', monospace;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      min-height: 100vh;
+    }
+    a { color: var(--accent-lt); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    img { max-width: 100%; display: block; }
+
+    /* ── Typography ── */
+    h1 { font-size: clamp(2.4rem, 5vw, 4rem); font-weight: 800; line-height: 1.15; }
+    h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; }
+    h3 { font-size: 1.1rem; font-weight: 600; }
+    p  { color: var(--muted); font-size: 1.05rem; }
+
+    /* ── Layout ── */
+    .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+    section { padding: 88px 0; }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(15,23,42,.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 0;
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 700; font-size: 1.15rem; color: var(--text);
+    }
+    .nav-logo img { width: 32px; height: 32px; border-radius: 8px; }
+    .nav-links { display: flex; gap: 28px; align-items: center; }
+    .nav-links a { color: var(--muted); font-size: .93rem; transition: color .2s; }
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 24px; border-radius: 9px; font-weight: 600; font-size: .95rem;
+      transition: all .2s; cursor: pointer; border: none;
+    }
+    .btn-primary {
+      background: var(--accent); color: #fff;
+      box-shadow: 0 0 28px var(--accent-glow);
+    }
+    .btn-primary:hover { background: var(--accent-lt); text-decoration: none; transform: translateY(-1px); }
+    .btn-outline {
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent-lt); text-decoration: none; }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+      background: radial-gradient(ellipse 70% 60% at 50% -10%, rgba(99,102,241,.18) 0%, transparent 70%);
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(99,102,241,.12); border: 1px solid var(--border);
+      border-radius: 99px; padding: 6px 16px; font-size: .82rem;
+      color: var(--accent-lt); margin-bottom: 28px;
+    }
+    .hero-badge span { background: var(--accent); border-radius: 99px; padding: 1px 8px; color: #fff; font-size: .75rem; }
+    .hero h1 { margin-bottom: 20px; }
+    .hero h1 em { color: var(--accent-lt); font-style: normal; }
+    .hero .sub {
+      max-width: 580px; margin: 0 auto 40px; font-size: 1.15rem; color: var(--muted);
+    }
+    .hero-cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .hero-note { margin-top: 18px; font-size: .83rem; color: var(--muted); }
+
+    /* ── BROWSER MOCKUP ── */
+    .mockup-wrap { margin: 60px auto 0; max-width: 740px; }
+    .browser {
+      background: var(--bg2); border-radius: 14px;
+      border: 1px solid var(--border);
+      box-shadow: 0 40px 100px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.04);
+      overflow: hidden;
+    }
+    .browser-bar {
+      background: var(--bg); padding: 12px 16px;
+      display: flex; align-items: center; gap: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .dot { width: 11px; height: 11px; border-radius: 50%; }
+    .dot-r { background: #ef4444; }
+    .dot-y { background: #f59e0b; }
+    .dot-g { background: #22c55e; }
+    .url-bar {
+      flex: 1; background: rgba(255,255,255,.05); border-radius: 6px;
+      padding: 5px 12px; font-size: .8rem; color: var(--muted);
+      font-family: var(--mono);
+    }
+    .ext-icon {
+      width: 26px; height: 26px; background: var(--accent);
+      border-radius: 6px; display: flex; align-items: center; justify-content: center;
+      font-weight: 800; color: #fff; font-size: .85rem; cursor: pointer;
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+    .popup-preview {
+      margin: 20px auto; width: 360px;
+      background: var(--bg2); border-radius: 12px; border: 1px solid var(--border);
+      overflow: hidden; font-size: .82rem;
+    }
+    .pp-header {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      padding: 14px 16px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .pp-logo {
+      width: 28px; height: 28px; background: var(--accent); border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; color: #fff; font-size: .85rem;
+    }
+    .pp-title { font-weight: 700; color: var(--text); font-size: .9rem; }
+    .pp-url { color: var(--muted); font-size: .75rem; }
+    .pp-scores {
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; padding: 12px;
+    }
+    .pp-score {
+      background: var(--bg); border-radius: 8px; padding: 8px 6px; text-align: center;
+      border: 1px solid var(--border);
+    }
+    .pp-score-val { font-size: 1.25rem; font-weight: 800; color: var(--text); }
+    .pp-score-val.green { color: var(--green); }
+    .pp-score-val.yellow { color: var(--yellow); }
+    .pp-score-val.red { color: var(--red); }
+    .pp-score-label { font-size: .65rem; color: var(--muted); margin-top: 2px; }
+    .pp-tags { padding: 0 12px 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag {
+      background: rgba(99,102,241,.15); border: 1px solid rgba(99,102,241,.3);
+      border-radius: 6px; padding: 3px 8px; font-size: .73rem; color: var(--accent-lt);
+    }
+    .tag.cms { background: rgba(34,197,94,.12); border-color: rgba(34,197,94,.3); color: #4ade80; }
+    .tag.framework { background: rgba(99,102,241,.15); border-color: rgba(99,102,241,.3); color: var(--accent-lt); }
+    .tag.analytics { background: rgba(245,158,11,.12); border-color: rgba(245,158,11,.3); color: #fbbf24; }
+    .tag.cdn { background: rgba(239,68,68,.12); border-color: rgba(239,68,68,.3); color: #f87171; }
+    .tag.cloud { background: rgba(20,184,166,.12); border-color: rgba(20,184,166,.3); color: #2dd4bf; }
+
+    /* ── STATS BAR ── */
+    .stats-bar {
+      background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      padding: 40px 0;
+    }
+    .stats-inner {
+      display: flex; justify-content: center; align-items: center;
+      gap: 48px; flex-wrap: wrap;
+    }
+    .stat { text-align: center; }
+    .stat-val { font-size: 2.2rem; font-weight: 800; color: var(--text); }
+    .stat-val span { color: var(--accent-lt); }
+    .stat-label { font-size: .83rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── FEATURES ── */
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;
+    }
+    .feat-card {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 28px; transition: border-color .2s, transform .2s;
+    }
+    .feat-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+    .feat-icon {
+      width: 44px; height: 44px; background: rgba(99,102,241,.15); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; margin-bottom: 16px;
+    }
+    .feat-card h3 { color: var(--text); margin-bottom: 8px; }
+    .feat-card p { font-size: .9rem; }
+
+    /* ── HOW IT WORKS ── */
+    .steps { display: flex; flex-direction: column; gap: 24px; max-width: 720px; margin: 0 auto; }
+    .step { display: flex; gap: 20px; align-items: flex-start; }
+    .step-num {
+      flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%;
+      background: var(--accent); display: flex; align-items: center; justify-content: center;
+      font-weight: 800; color: #fff; font-size: .95rem;
+    }
+    .step-body h3 { color: var(--text); margin-bottom: 6px; }
+    .step-body p { font-size: .93rem; }
+
+    /* ── DETECTIONS TABLE ── */
+    .detections-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;
+    }
+    .det-card {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px;
+    }
+    .det-card h3 { color: var(--text); margin-bottom: 12px; font-size: 1rem; }
+    .det-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+    .det-list li {
+      font-size: .85rem; color: var(--muted);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .det-list li::before { content: '▸'; color: var(--accent-lt); }
+
+    /* ── PRIVACY ── */
+    .privacy-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;
+    }
+    .priv-card {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 24px; text-align: center;
+    }
+    .priv-icon { font-size: 2rem; margin-bottom: 12px; }
+    .priv-card h3 { color: var(--text); margin-bottom: 8px; font-size: .95rem; }
+    .priv-card p  { font-size: .85rem; }
+
+    /* ── OPEN SOURCE ── */
+    .oss-box {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 48px; text-align: center; max-width: 740px; margin: 0 auto;
+    }
+    .oss-box h2 { margin-bottom: 16px; }
+    .oss-box p  { max-width: 520px; margin: 0 auto 32px; }
+    .oss-cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+    /* ── CWS BADGE ── */
+    .cws-section { text-align: center; }
+    .cws-section h2 { margin-bottom: 12px; }
+    .cws-section p  { max-width: 500px; margin: 0 auto 36px; }
+    .cws-btn {
+      display: inline-flex; align-items: center; gap: 12px;
+      background: #fff; color: #1a1a2e;
+      padding: 14px 32px; border-radius: 10px; font-weight: 700; font-size: 1.05rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,.3); transition: transform .2s, box-shadow .2s;
+    }
+    .cws-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 40px rgba(0,0,0,.4); text-decoration: none; color: #1a1a2e; }
+    .chrome-logo { width: 28px; height: 28px; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--bg3); border-top: 1px solid var(--border);
+      padding: 40px 0;
+    }
+    .footer-inner {
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;
+    }
+    .footer-logo { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--muted); }
+    .footer-logo img { width: 24px; height: 24px; border-radius: 5px; }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { color: var(--muted); font-size: .88rem; transition: color .2s; }
+    .footer-links a:hover { color: var(--text); text-decoration: none; }
+    .footer-copy { color: var(--muted); font-size: .82rem; width: 100%; text-align: center; margin-top: 16px; }
+
+    /* ── Section titles ── */
+    .section-label {
+      text-transform: uppercase; letter-spacing: .12em; font-size: .78rem;
+      color: var(--accent-lt); font-weight: 600; margin-bottom: 10px;
+    }
+    .section-title { margin-bottom: 14px; }
+    .section-sub { max-width: 560px; margin: 0 auto 52px; text-align: center; }
+    .center { text-align: center; }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .hero { padding: 70px 0 60px; }
+      .stats-inner { gap: 28px; }
+      .oss-box { padding: 30px 20px; }
+      section { padding: 60px 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ───────────────────────────────────────────── -->
+<nav>
+  <div class="container nav-inner">
+    <a href="#" class="nav-logo" style="text-decoration:none">
+      <img src="../assets/icon48.png" alt="StackSight icon" />
+      StackSight
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#detections">What we detect</a>
+      <a href="#privacy">Privacy</a>
+      <a href="https://github.com/vetrisuriya/stacksight" target="_blank" rel="noopener">GitHub</a>
+    </div>
+    <a class="btn btn-primary" href="https://chrome.google.com/webstore/detail/stacksight" target="_blank" rel="noopener">
+      Add to Chrome — Free
+    </a>
+  </div>
+</nav>
+
+<!-- ── HERO ──────────────────────────────────────────── -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">
+      <span>NEW</span> Free &amp; Open Source · No Login · No Data Collection
+    </div>
+    <h1>
+      Instantly discover<br />
+      <em>any website's tech stack</em>
+    </h1>
+    <p class="sub">
+      One click. Zero data sent anywhere. StackSight reveals the exact CMS, frameworks,
+      analytics tools, CDN, cloud provider, and security posture of any site you visit.
+    </p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="https://chrome.google.com/webstore/detail/stacksight" target="_blank" rel="noopener">
+        🧩 Add to Chrome — Free
+      </a>
+      <a class="btn btn-outline" href="https://github.com/vetrisuriya/stacksight" target="_blank" rel="noopener">
+        ⭐ Star on GitHub
+      </a>
+    </div>
+    <p class="hero-note">Chrome · Manifest V3 · MIT License · No account required</p>
+
+    <!-- Browser mockup -->
+    <div class="mockup-wrap">
+      <div class="browser">
+        <div class="browser-bar">
+          <span class="dot dot-r"></span>
+          <span class="dot dot-y"></span>
+          <span class="dot dot-g"></span>
+          <div class="url-bar">🔒 https://shopify.com</div>
+          <div class="ext-icon">S</div>
+        </div>
+        <div style="display:flex;justify-content:center;padding:28px 0 24px;background:var(--bg);">
+          <div class="popup-preview">
+            <div class="pp-header">
+              <div class="pp-logo">S</div>
+              <div>
+                <div class="pp-title">StackSight</div>
+                <div class="pp-url">shopify.com</div>
+              </div>
+            </div>
+            <div class="pp-scores">
+              <div class="pp-score">
+                <div class="pp-score-val green">82</div>
+                <div class="pp-score-label">Technology</div>
+              </div>
+              <div class="pp-score">
+                <div class="pp-score-val yellow">65</div>
+                <div class="pp-score-label">Security</div>
+              </div>
+              <div class="pp-score">
+                <div class="pp-score-val green">88</div>
+                <div class="pp-score-label">Performance</div>
+              </div>
+              <div class="pp-score">
+                <div class="pp-score-val red">40</div>
+                <div class="pp-score-label">Privacy</div>
+              </div>
+            </div>
+            <div class="pp-tags">
+              <span class="tag cms">Shopify</span>
+              <span class="tag framework">React</span>
+              <span class="tag framework">jQuery</span>
+              <span class="tag analytics">GA4</span>
+              <span class="tag analytics">GTM</span>
+              <span class="tag cdn">Cloudflare</span>
+              <span class="tag cloud">AWS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── STATS ─────────────────────────────────────────── -->
+<div class="stats-bar">
+  <div class="container stats-inner">
+    <div class="stat">
+      <div class="stat-val">9<span>+</span></div>
+      <div class="stat-label">CMS Platforms</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">17<span>+</span></div>
+      <div class="stat-label">Frameworks Detected</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">18<span>+</span></div>
+      <div class="stat-label">Analytics Tools</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">9<span>+</span></div>
+      <div class="stat-label">Cloud Providers</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">100<span>%</span></div>
+      <div class="stat-label">Local Processing</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FEATURES ──────────────────────────────────────── -->
+<section id="features">
+  <div class="container">
+    <div class="center">
+      <p class="section-label">Features</p>
+      <h2 class="section-title">Everything a developer needs</h2>
+    </div>
+    <p class="section-sub">
+      StackSight runs a three-layer detection pipeline — DOM signals, JS globals, and HTTP headers —
+      to give you the most accurate picture possible.
+    </p>
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon">🔍</div>
+        <h3>Stack Detection</h3>
+        <p>Identifies CMS, frontend frameworks, JS libraries, backend language, CDN, and cloud provider with confidence scores.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📊</div>
+        <h3>Analytics Audit</h3>
+        <p>Spots 18+ tracking tools — GA4, GTM, Facebook Pixel, Hotjar, Mixpanel, Segment, Amplitude, Sentry, and more.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔒</div>
+        <h3>Security Score</h3>
+        <p>Audits 7 critical HTTP security headers and HTTPS status. Grades the site A+ through F with specific remediation advice.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">⚡</div>
+        <h3>Performance Insights</h3>
+        <p>Counts scripts, CSS files, images, fonts, and third-party resources. Flags bloat and gives actionable recommendations.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📤</div>
+        <h3>Export Reports</h3>
+        <p>Download a full analysis as JSON or plain text — perfect for reports, client decks, or archiving competitive research.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🌗</div>
+        <h3>Dark &amp; Light Mode</h3>
+        <p>Beautiful dark UI by default. One-click toggle to light mode. Preference saved automatically across all sessions.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── HOW IT WORKS ───────────────────────────────────── -->
+<section id="how-it-works" style="background:var(--bg2); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+  <div class="container">
+    <div class="center">
+      <p class="section-label">How it works</p>
+      <h2 class="section-title">Three layers. One second.</h2>
+    </div>
+    <p class="section-sub">
+      StackSight never sends your data anywhere. All three detection layers run locally inside your browser.
+    </p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>DOM Layer — HTML signals</h3>
+          <p>Scans script sources, link hrefs, meta generator tags, HTML attributes, and PerformanceResourceTiming entries to identify technology fingerprints embedded in the page markup.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>JavaScript Layer — Global objects</h3>
+          <p>Reads the page's own JS runtime (window.React, window.__NEXT_DATA__, window.jQuery, etc.) — the most reliable signals that can't be faked by CDN caching or proxies.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>HTTP Layer — Response headers</h3>
+          <p>The background service worker makes a HEAD request to the current URL and captures response headers: Server, X-Powered-By, CF-Cache-Status, security headers, and more.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h3>Analysis &amp; Scoring</h3>
+          <p>All three data layers are merged into a single pageData object. Each detector scores its confidence independently. Results render in the popup within 1–2 seconds.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── WHAT WE DETECT ─────────────────────────────────── -->
+<section id="detections">
+  <div class="container">
+    <div class="center">
+      <p class="section-label">What we detect</p>
+      <h2 class="section-title">Comprehensive coverage</h2>
+    </div>
+    <p class="section-sub">
+      StackSight recognises hundreds of technology fingerprints across six categories.
+    </p>
+    <div class="detections-grid">
+      <div class="det-card">
+        <h3>🗂 CMS Platforms</h3>
+        <ul class="det-list">
+          <li>WordPress</li>
+          <li>Shopify</li>
+          <li>Drupal</li>
+          <li>Joomla</li>
+          <li>Magento</li>
+          <li>Wix</li>
+          <li>Squarespace</li>
+          <li>Ghost</li>
+          <li>Webflow</li>
+        </ul>
+      </div>
+      <div class="det-card">
+        <h3>⚙️ Frameworks &amp; Libraries</h3>
+        <ul class="det-list">
+          <li>React / Next.js</li>
+          <li>Vue / Nuxt</li>
+          <li>Angular / AngularJS</li>
+          <li>Svelte / Alpine.js</li>
+          <li>Astro / Ember</li>
+          <li>jQuery / Bootstrap</li>
+          <li>GSAP / Three.js</li>
+          <li>Tailwind / HTMX</li>
+        </ul>
+      </div>
+      <div class="det-card">
+        <h3>📈 Analytics &amp; Tracking</h3>
+        <ul class="det-list">
+          <li>Google Analytics 4</li>
+          <li>Google Tag Manager</li>
+          <li>Facebook Pixel</li>
+          <li>Hotjar / Clarity</li>
+          <li>Amplitude / Mixpanel</li>
+          <li>Segment / Heap</li>
+          <li>LinkedIn Insight</li>
+          <li>Sentry / Intercom</li>
+        </ul>
+      </div>
+      <div class="det-card">
+        <h3>☁️ Cloud &amp; CDN</h3>
+        <ul class="det-list">
+          <li>AWS / Azure / GCP</li>
+          <li>DigitalOcean</li>
+          <li>Vercel / Netlify</li>
+          <li>Cloudflare Pages</li>
+          <li>Cloudflare CDN</li>
+          <li>Amazon CloudFront</li>
+          <li>Akamai / Fastly</li>
+          <li>BunnyCDN / jsDelivr</li>
+        </ul>
+      </div>
+      <div class="det-card">
+        <h3>🔒 Security Headers</h3>
+        <ul class="det-list">
+          <li>HTTPS / HSTS</li>
+          <li>Content-Security-Policy</li>
+          <li>X-Frame-Options</li>
+          <li>X-Content-Type-Options</li>
+          <li>Referrer-Policy</li>
+          <li>Permissions-Policy</li>
+          <li>Cross-Origin-Opener-Policy</li>
+        </ul>
+      </div>
+      <div class="det-card">
+        <h3>⚡ Performance</h3>
+        <ul class="det-list">
+          <li>Script count</li>
+          <li>CSS file count</li>
+          <li>Image count</li>
+          <li>Web font count</li>
+          <li>Third-party resources</li>
+          <li>Total HTTP requests</li>
+          <li>Actionable recommendations</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PRIVACY ────────────────────────────────────────── -->
+<section id="privacy" style="background:var(--bg2); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+  <div class="container">
+    <div class="center">
+      <p class="section-label">Privacy</p>
+      <h2 class="section-title">Your data stays on your machine</h2>
+    </div>
+    <p class="section-sub">
+      StackSight was designed from the ground up with privacy as a first-class feature.
+    </p>
+    <div class="privacy-grid">
+      <div class="priv-card">
+        <div class="priv-icon">🚫</div>
+        <h3>No Server Communication</h3>
+        <p>We have no backend. Your analysis never leaves your browser.</p>
+      </div>
+      <div class="priv-card">
+        <div class="priv-icon">🔐</div>
+        <h3>No Account Required</h3>
+        <p>No sign-up, no login, no email. Install and use immediately.</p>
+      </div>
+      <div class="priv-card">
+        <div class="priv-icon">🍪</div>
+        <h3>No Tracking Cookies</h3>
+        <p>The extension sets zero cookies and reads only the page you're on.</p>
+      </div>
+      <div class="priv-card">
+        <div class="priv-icon">👁️</div>
+        <h3>No Data Collection</h3>
+        <p>We don't collect browsing history, URLs visited, or any personal data.</p>
+      </div>
+      <div class="priv-card">
+        <div class="priv-icon">📖</div>
+        <h3>Open Source</h3>
+        <p>Every line of code is public on GitHub. Audit it yourself anytime.</p>
+      </div>
+      <div class="priv-card">
+        <div class="priv-icon">🆓</div>
+        <h3>100% Free</h3>
+        <p>No premium tier, no subscription, no hidden paywall. Forever free.</p>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:36px;">
+      <a href="privacy.html" class="btn btn-outline">Read Full Privacy Policy →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── OPEN SOURCE ─────────────────────────────────────── -->
+<section id="opensource">
+  <div class="container">
+    <div class="oss-box">
+      <h2>Built in the open</h2>
+      <p>
+        StackSight is MIT-licensed and fully open source. No vendor lock-in, no premium gating,
+        no analytics in the extension itself. Contributions, bug reports, and feature ideas
+        are always welcome.
+      </p>
+      <div class="oss-cta">
+        <a class="btn btn-primary" href="https://github.com/vetrisuriya/stacksight" target="_blank" rel="noopener">
+          ⭐ View on GitHub
+        </a>
+        <a class="btn btn-outline" href="https://github.com/vetrisuriya/stacksight/issues/new?template=feature_request.md" target="_blank" rel="noopener">
+          💡 Request a Feature
+        </a>
+        <a class="btn btn-outline" href="https://github.com/vetrisuriya/stacksight/issues/new?template=bug_report.md" target="_blank" rel="noopener">
+          🐛 Report a Bug
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CWS CTA ─────────────────────────────────────────── -->
+<section class="cws-section" style="background:var(--bg2); border-top:1px solid var(--border);">
+  <div class="container">
+    <p class="section-label center">Get started</p>
+    <h2>Add StackSight to Chrome</h2>
+    <p>Free forever. Install in 10 seconds. No account needed.</p>
+    <a class="cws-btn" href="https://chrome.google.com/webstore/detail/stacksight" target="_blank" rel="noopener">
+      <svg class="chrome-logo" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="24" cy="24" r="24" fill="#fff"/>
+        <circle cx="24" cy="24" r="12" fill="#4285F4"/>
+        <path d="M24 12h20a24 24 0 0 0-40 0z" fill="#EA4335"/>
+        <path d="M4 12A24 24 0 0 0 14 44L24 26A12 12 0 0 1 12 12z" fill="#FBBC05"/>
+        <path d="M44 12H24a12 12 0 0 1 10 18l10 14A24 24 0 0 0 44 12z" fill="#34A853"/>
+        <circle cx="24" cy="24" r="6" fill="#fff"/>
+      </svg>
+      Add to Chrome — It's Free
+    </a>
+  </div>
+</section>
+
+<!-- ── FOOTER ─────────────────────────────────────────── -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <img src="../assets/icon48.png" alt="StackSight" />
+        StackSight
+      </div>
+      <div class="footer-links">
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="https://github.com/vetrisuriya/stacksight" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/vetrisuriya/stacksight/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing</a>
+        <a href="https://github.com/vetrisuriya/stacksight/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
+      </div>
+    </div>
+    <div class="footer-copy">
+      © 2026 StackSight Contributors · MIT License · Made with ❤️ for the developer community
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
