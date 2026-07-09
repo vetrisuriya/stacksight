@@ -42,48 +42,32 @@ Instantly detect any website's tech stack: CMS, frameworks, analytics, CDN, clou
 
 One click. One second. Zero data sent anywhere.
 
-StackSight is a free, open-source Chrome Extension that reveals the exact technology stack powering any website you visit — without sending a single byte of your data to any server.
+StackSight is a free, open-source Chrome Extension that reveals the technology stack powering any website you visit — the content management system, frontend framework, analytics tools, hosting infrastructure, and security posture — without sending a single byte of your data to any server.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ WHAT STACKSIGHT DETECTS
+🔍 WHAT IT DETECTS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🗂 CMS PLATFORMS
-→ WordPress, Shopify, Drupal, Joomla, Magento, Wix, Squarespace, Ghost, Webflow
+🗂 CONTENT MANAGEMENT SYSTEM
+StackSight identifies which CMS is powering a site — whether it's a popular blogging platform, an e-commerce solution, an open-source enterprise system, or a hosted website builder. It detects over 9 platforms using DOM signals, JavaScript globals, response headers, and generator meta tags.
 
 ⚙️ FRONTEND FRAMEWORKS & LIBRARIES
-→ React, Next.js, Vue, Nuxt, Angular, AngularJS, Svelte, Alpine.js, Astro, Ember
-→ jQuery, Bootstrap, Lodash, Moment.js, GSAP, Three.js, Tailwind CSS, HTMX
+The extension identifies the JavaScript framework or UI library used to build the front end — including major React-based, Vue-based, and Angular-based ecosystems, as well as newer compile-time frameworks and utility-first approaches. Common animation libraries and CSS frameworks are also detected.
 
 📈 ANALYTICS & TRACKING TOOLS
-→ Google Analytics 4, Google Tag Manager, Facebook Pixel, Hotjar, Microsoft Clarity
-→ LinkedIn Insight, Amplitude, Mixpanel, Segment, Intercom, Heap
-→ TikTok Pixel, Twitter/X Pixel, Optimizely, VWO, Crisp, Sentry
+StackSight reveals which analytics and tracking tools are loaded on a page — including tag managers, session-recording tools, heatmap services, A/B testing platforms, customer messaging tools, and error monitoring services. It detects 18+ tools and uses the count to calculate a privacy score.
 
-☁️ CLOUD PROVIDERS
-→ AWS, Microsoft Azure, Google Cloud, DigitalOcean, Vercel, Netlify
-→ Cloudflare Pages, Heroku, Render
+☁️ CLOUD & HOSTING INFRASTRUCTURE
+The extension identifies where a website is hosted — major cloud platforms, modern edge-hosting providers, and traditional PaaS services — using response headers, asset URL patterns, and server signatures.
 
-🌐 CDN PROVIDERS
-→ Cloudflare, Amazon CloudFront, Akamai, Fastly, BunnyCDN, KeyCDN
-→ MaxCDN / StackPath, jsDelivr, unpkg
+🌐 CONTENT DELIVERY NETWORK
+StackSight detects which CDN is serving the site's assets, using HTTP headers such as cache-status identifiers and server signatures, as well as asset URL patterns pointing to CDN domains.
 
-🔒 SECURITY ANALYSIS
-→ HTTPS detection
-→ Content-Security-Policy (CSP)
-→ Strict-Transport-Security (HSTS)
-→ X-Frame-Options
-→ X-Content-Type-Options
-→ Referrer-Policy
-→ Permissions-Policy
-→ Cross-Origin-Opener-Policy
-→ Security grade: A+ to F
+🔒 SECURITY HEADER AUDIT
+The extension performs a live audit of 7 critical HTTP security headers — Content-Security-Policy, Strict-Transport-Security (HSTS), X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, and Cross-Origin-Opener-Policy — and produces a score from 0 to 100 with a letter grade (A+ to F). Missing headers are listed with plain-English remediation advice.
 
-⚡ PERFORMANCE INSIGHTS
-→ Script count, CSS count, image count, font count
-→ Third-party resource count
-→ Total HTTP requests
-→ Actionable recommendations
+⚡ PERFORMANCE SNAPSHOT
+StackSight counts the page's scripts, stylesheets, images, web fonts, and third-party resources, and flags counts that exceed recommended thresholds with actionable recommendations.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🔒 100% PRIVATE — YOUR DATA NEVER LEAVES YOUR BROWSER
@@ -97,52 +81,47 @@ StackSight is built with privacy as a first-class feature:
 • No cookies set by the extension
 • No cloud storage, no database, no backend server
 • All processing happens locally in your browser
-• The only network request is a HEAD call to the site you are already visiting
+• The only outbound request is a HEAD call to the site you are already visiting, to read its response headers
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📤 EXPORT YOUR ANALYSIS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Download your analysis as:
-• JSON — structured, machine-readable, perfect for automation
-• TXT — human-readable report for client decks and documentation
+Download your full analysis as:
+• JSON — structured and machine-readable, ideal for automation or archiving
+• TXT — human-readable report suited for client deliverables or documentation
 
-Both export entirely locally — no upload, no server.
+Both formats are generated entirely in your browser and downloaded locally. No upload, no server.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🌗 DARK & LIGHT MODE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Beautiful dark UI by default. One-click toggle to light mode.
-Your preference is saved automatically.
+Beautiful dark UI by default with a one-click toggle to light mode. Your theme preference is saved automatically between sessions.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📖 OPEN SOURCE — MIT LICENSE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-StackSight is 100% open source. Every line of code is on GitHub.
-Contributions, bug reports, and feature requests are always welcome.
-
-GitHub: https://github.com/vetrisuriya/stacksight
+StackSight is 100% open source and MIT licensed. Every line of code is on GitHub. Contributions, bug reports, and feature requests are always welcome.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 👥 WHO IS STACKSIGHT FOR?
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-• Developers — discover the stack before you apply for a job or start a project
-• Technical Marketers — audit competitor tech stacks for strategic insights
-• Consultants & Agencies — quickly profile client websites during discovery
-• Security Researchers — audit security headers on any site
-• Curious technologists — satisfy your "what is this site built with?" curiosity instantly
+• Developers who want to understand a site's architecture before joining a project or evaluating a codebase
+• Technical marketers performing competitive technology research
+• Agencies and consultants running discovery sessions before onboarding new clients
+• Security researchers auditing HTTP header configurations
+• Curious technologists who wonder what any given website is built with
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 💬 SUPPORT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Found a bug or want a new technology detected?
-Open an issue: https://github.com/vetrisuriya/stacksight/issues
+Found a bug or want a new technology detected? Open an issue on GitHub.
 
-StackSight is free forever. No premium version. No subscription.
+StackSight is free forever. No premium version. No subscription. No upsell.
 ```
 
 ---
@@ -305,7 +284,7 @@ https://your-org.github.io/stacksight
 
 ### Support URL
 ```
-https://github.com/vetrisuriya/stacksight/issues
+https://github.com/your-org/stacksight/issues
 ```
 
 ### Version Number
@@ -366,4 +345,4 @@ Once approved:
 
 ---
 
-*Last updated: June 2026 · StackSight v1.0.0*
+*Last updated: June 2025 · StackSight v1.0.0*
